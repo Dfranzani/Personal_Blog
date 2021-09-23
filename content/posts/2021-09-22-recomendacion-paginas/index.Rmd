@@ -1,0 +1,37 @@
+---
+title: Recomendación de herramientas, plataformas y documentos
+author: Daniel
+date: '2021-09-15'
+slug: []
+categories: []
+tags:
+  - R
+  - Estadística
+  - Páginas
+---
+
+A continuación, dejo un listado de algunas heramientas y documentación que recomiendo usar o integrar al trabajo que realicen en torno a R. Este listado, se irá actualizando a través el tiempo. Espero sea de utilidad.
+
+### [**R**](https://www.r-project.org/)
+Es el lenguaje de programación con el cual se divulga este blog. Sin embargo, es útil conocer otros lenguajes tales como Python y SQL, ya que, hoy en día es necesario manejar distintas herramientas para abordar un problema, sin mencionar la demanda laboral detrás de ellos. Cabe destacar, que R sobresale por su enfoque estadístico en comparación a los otros dos.
+
+## [IDE: RStudio](https://www.rstudio.com/)
+RStudio es un entorno de desarrollo integrado (IDE por sus siglas en inglés) sumamente popular debido a su integración de paneles de trabajo, además de la comodidad que ofrece para trabajar con R, Python, HTML, SQL, C++. Por otro lado, RStudio incorpora desde su servicio el tan conocido R Markdown, al igual que otras herramientas  tales como R Sweave, Shiny Web App, R HTML, entre otras.
+
+Existen otros IDE con lo cuales se puede trabajar con R, pero con una menor integración, dentro de mis favoritos se encuentra [VS Code](https://code.visualstudio.com/) y [Atom](https://atom.io/).
+
+## [RStudio Cloud](https://rstudio.cloud/)
+
+Esta herramienta es una versión en línea de RStudio, ideal para aquellos que no desean instalar la versión de escritorio por temas de espacio u otros motivos. Sin embargo, hay que tener ciertos cuidados a la hora de usarlo, debido a que no todos los paquetes están disponibles por defecto en esta aplicación.
+
+Una alternativa que se ha estado haciendo popular es la de Google Colab R, siendo una versión similar al Jupyter Notebook de Python. Al igual que RStudio, es ideal para aquellos que desean trabajar en línea.
+
+## [Shiny from RStudio](https://shiny.rstudio.com/)
+
+RStudio tienen implementada aplicaciones de visualización web, Shiny es aquella que nos permite hacer esto y que mejor que entender esto con un [ejemplo](https://shiny.rstudio.com/gallery/) . En resumen, permite incorporar gráficos interactivos en tiempo real. 
+
+Esta herramienta puede tener distintos niveles de complejidad, sobre todo cuando se requiere incorporar con otras plataformas como AWS. Sin embargo, en este blog haremos uso de una de las plataformas más utilizadas para publicar este tipo de trabajos, está es [ShinyApps.io](https://www.shinyapps.io/) de Rstudio (posee una versión gratuita y otras de pago).
+
+## [R Markdown: The Definitive Guide](https://bookdown.org/yihui/rmarkdown/)
+
+El manual de **R Markdown** para aprender todo lo relacionado con el tema, tanto presentaciones, documentos, paginas web, entre otros.

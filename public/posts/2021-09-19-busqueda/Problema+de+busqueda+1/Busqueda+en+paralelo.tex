@@ -1,0 +1,212 @@
+\documentclass[letterpaper,11pt,spanish]{article}
+\usepackage[utf8]{inputenc} % Tipografía
+\usepackage[spanish, es-tabla]{babel} % Idioma
+\usepackage{textcomp,mathrsfs,amsmath,amsthm,amssymb,amsfonts,multicol,indentfirst,float,longtable,xcolor,
+			enumerate,array,multirow,graphicx,tabularx,ragged2e,adjustbox,centernot,booktabs,hyperref,tikz,
+			caption, wrapfig,colortbl,tabu,threeparttable,threeparttablex,makecell}
+\usepackage{ifthen,intcalc} % Paquetes funcionales
+%\usepackage{media9,comment,moreverb} % Paquetes para contenido multimedia
+\usepackage[nottoc, notlof, notlot,numbib]{tocbibind}
+\usepackage[encoding,filenameencoding=utf8]{grffile}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{titlesec} % Paquete para modificar tamaño de título
+\usepackage{fancyhdr} % Modificar cabeza y pie de página
+\usepackage{colortbl} % Modificar estilo de las líneas en tabular (la uso para cambia el color)
+\usepackage{setspace} % Espaciado del texto
+\usepackage[hang]{footmisc} % Espaciado de las notas de pie de pagina
+%\usepackage{titlecaps}
+%\usepackage{sectsty}
+\author{}
+\date{}
+\title{}
+
+% \pagestyle{fancy} % Estilo de pie en encabezado de página
+\decimalpoint % Decimales por defecto con punto
+\hypersetup{hidelinks} % Ocultar color de referencias
+
+\newcommand\dis{\displaystyle}
+\newcommand{\comment}[1]{}
+%\renewcommand{\baselinestretch}{1.5} % Tambien sirve para modificar el espaciado en el texto.
+% \renewcommand{\footnotelayout}{\setstretch{1}}  % Espaciado de las notas al piede pagina
+% \renewcommand{\arraystretch}{1} % Espaciado de tablas
+% \addto\captionsspanish{% Replace "english" with the language you use
+%   \renewcommand{\listfigurename}{Índice de Figuras} % Titulo de indice de figuras
+%   \renewcommand{\listtablename}{Índice de Tablas} % Titulo de indice de tablas
+% }
+
+
+% \setlength\headheight{26pt} % Tamaño de encabezado
+% \fancyhf{} % sets both header and footer to nothing
+% \renewcommand{\headrulewidth}{0pt}
+
+% \lhead{{\color{blue}\rule{1cm}{1cm}}}
+% \lhead{\includegraphics[width=5cm]{D:/OneDrive/Universidades/UTEM/Logo/DGD_dspe}}
+% Logos de departamentos en encabezado y pie de página
+% \lhead{\begin{picture}(3,3) \put(-7,2){\includegraphics[width=3.5cm]{D:/OneDrive/Universidades/UTEM/Logo/VRAC}} \end{picture}}
+% \rhead{\begin{picture}(3,3) \put(-380,0){\includegraphics[width=19cm]{D:/OneDrive/Universidades/UTEM/Logo/Barra}} \end{picture}}
+% \lfoot{\begin{picture}(3,3) \put(-10,-17){\includegraphics[width=5cm]{D:/OneDrive/Universidades/UTEM/Logo/DGD_dspe}} \end{picture}}
+
+% Formatos especiales de titulos de sección y subsección
+% \titleformat{\section}
+%   {\normalfont\large\bfseries}{\thesection.}{1em}{\MakeUppercase} % Editamos mayúsculas, espacio y terminación con punto
+%   
+% \titleformat{\subsection}
+%   {\normalfont\large\bfseries}{\thesubsection.}{1em}{} % Editamos espacio y terminación con punto
+
+%\titleformat{\section}{\normalfont\fontsize{16}{19}}
+
+%<<include=FALSE>>=
+%library(knitr)
+%knitr::opts_chunk$set(echo = F, message = F, warning = F, include = F)
+%#knit_hooks$set(document = function(x) {sub('\\usepackage[]{color}', '\\usepackage{xcolor}', x, fixed = TRUE)})
+%•
+%
+%<<>>=
+%# library(agricolae)
+%# library(scales)
+%library(kableExtra)
+%library(dplyr)
+%library(stringr)
+%library(viridis)
+%library(openxlsx)
+%# library(psych)
+%options(knitr.table.format = "latex")
+%•
+
+\begin{document}
+
+% \setstretch{1.5} % Interlineado
+% Para modificar el interlineado usar /begin{spaceing}{1.0} \end{spacing} del paquete setspace
+
+%\begin{flushleft}
+%\includegraphics[width=5cm]{D:/OneDrive/Universidades/UTEM/Logo/DGD_dspe}
+%\end{flushleft}
+\begin{center}
+{\Large{\textbf{Búsqueda en paralelo}: problema de las $n$ - reinas}}
+\end{center}
+
+
+Hagamos referencia al tablero como una matriz $X_{n\times n}$ con elementos $x_{i,j}$, en la cual, los valores de las celdas están determinados por una función indicatriz $x_{i,j} = I_{i,j}$, tal que:
+
+\begin{equation}
+\forall j = 1,\ldots,n, \exists! i \in {1,\ldots,n}: I_{i,j} \neq 0 
+\end{equation}
+
+Además,
+\begin{equation}
+I_{i,j_1} \neq I_{i,j_2} \forall j_1,j_2 = 1,\ldots,n, n=1 \vee n\geq 4
+\end{equation}
+
+Lo anterior indica, que aquellas casillas que posean un 1 son en las cuales hay una reina, específicamente indica que por cada fila y columna, se encuentra solo 1 reina.
+
+Por otro lado, existen variadas condiciones que deben cumplir la disposición de unos y ceros. En primer lugar encontramos y equivalente a lo expuesto en (2):
+
+\begin{equation}
+\begin{split}
+\sum_{i=1}^n x_{i,j} = 1, \forall j = ,\ldots,n, \text{  }  \text{  }
+\sum_{j=1}^n x_{i,j} = 1, \forall i = ,\ldots,n\\
+\end{split}
+\end{equation}
+
+Además, es necesario establecer que para todas las diagonales de una matriz, los elemento de la diagonal suman uno. Para entender que son la diagonales de una matriz, se muestra el siguiente  ejemplo:
+\begin{equation}
+\begin{pmatrix}
+\color{blue}{2} & \color{red}{5} & 0\\
+7 & \color{blue}{3} & \color{red}{8}\\
+3 & 0 & \color{blue}{1}
+\end{pmatrix}\\
+\begin{pmatrix}
+2 & \color{red}{5} & 0\\
+\color{red}{7} & 3 & 8\\
+3 & 0 & 1
+\end{pmatrix},
+\end{equation}
+
+en el cual, la matriz de la izquierda muestra algunas diagonales (azul y rojo) que son de orden descendente (de izquierda a derecha), y en la matriz de la derecha visualizamos una diagonal ascendente (de izquierda a derecha).
+
+En este sentido, podemos formalizar el conjunto de celdas que forman una diagonal, de la siguiente manera. Consideremos una colección $h$ de celdas de la matriz, de tal manera que podemos construir una secuencia, ordenando los elementos convenientemente ($k,\ldots,t$), en donde
+
+\begin{equation}
+(x^h_{i,j})_k,\ldots,(x^h_{i,j})_t,\text{ } 1\leq k \leq t\leq n
+\end{equation}
+
+corresponde a la una secuencia de una colección, con orden indexado, respecto a las celdas de $X$. (\textbf{Nota}: la cantidad de elementos a ordenar debe ser mayor a 1, cuando $n \geq 4$.)
+
+Luego, se exige que el ordenamiento de la colección $h$ cumpla lo siguiente:
+
+\begin{equation}
+\begin{matrix}
+i_{k+1} = i_k+1\\
+j_{k+1} = j_k+1\\
+\end{matrix}\\ \vee
+\begin{matrix}
+i_{k+1} = i_k-1\\
+j_{k+1} = j_k+1\\
+\end{matrix}
+\end{equation}
+
+Además, para el miembro izquierdo de (6) no debe existir un elemento $x_{i'\leq n,j'\leq n} \in X : i_{t+1} = i'\leq n \wedge j_{t+1} = j'\leq n, t\leq n$. De modo similar, considerar para miembro derecho de la expresión. En caso de existir dicho elemento de $X$, se debe incluir en $h$.
+
+Entonces, se plantea la condición de suma
+\begin{equation}
+\sum_{k=1}^t(x^h_{i,j})_k = 1
+\end{equation}
+
+De esta manera, esta colección de celdas de $X$ corresponde a los elementos de las diagonales, los cuales deben sumar 1; dejando fuera colecciones de diagonales incompletas (por ejemplo, tomar solo los dos primeros elementos de una diagonal principal de una matriz cuadrada de dimensión 3). Es posible entender esto como ``Solo puede haber una reina por diagonal'' (guiarse visualmente por (4)).
+
+Hasta el momento, una colección (disposición) de celdas con unos y ceros es solución de $X$, si cumple con las condiciones (1), (2) y (7)
+
+Ahora, consideremos una colección de celdas (índices) de $X$, $\lbrace (i,j)_k,\ldots,(i,j)_t \rbrace$, que tiene un valor asignado de 1 (para el resto de celdas el valor es 0), de tal manera que se desea verificar si dicha disposición cumple con las condiciones de (1), (2) y (7). 
+
+En este sentido, si bien se pueden verificar las condiciones, también es posible reducir aun más al margen de trabajo de la expresiones. Para ello, se define una secuencia cualquiera con los elementos de la colección $(i,j)_k,\ldots,(i,j)_t$. 
+
+Luego, por expuesto en (6), es fácil ver que solo uno de los índices de las celdas puede ordenarse de manera creciente (o decreciente), mientras el restante no obedece patrón alguno.
+
+Así, definimos el reordenamiento como $(i,j)_k^*,\ldots,(i,j)_t^*$, de tal forma que $1\leq i_k^*<\ldots < i_t^*\leq n \geq 4$ (para el caso $n=1$ es trivial el ordenamiento). Es igual de válido elegir reordenar la columnas, el resultado no cambia. (\textbf{Nota}: es fácil ver que la indexación de la colección, no se ve afectada teóricamente en caso de que una diagonal sea considerada ascendente o descendente.)
+
+Gracias a este resultado, podemos establecer candidatos a soluciones de la matriz $X$, de tal forma que el orden de los candidatos representa la fila en la que van ubicados. Así, el candidato en cuestión, solo refleja la posición $j$ columna en donde va ubicada la reina.
+
+Por lo tanto, la colección $(i,j)_k^*,\ldots,(i,j)_t^*$, puede escribirse como una secuencia ordenada $C_1,\ldots,C_n$, la cual representa la posición de las columnas en las que están posicionadas las reinas.
+
+Para simplificar los expuesto en (6), podemos considerar la operación  en el índice opuesto, sin pérdida de generalidad, es decir, se debe cumplir que
+
+\begin{equation}
+\begin{matrix}
+j_{k+1} = j_k+1\\
+\end{matrix}\\ \vee
+\begin{matrix}
+j_{k+1} = j_k-1\\
+\end{matrix},
+\end{equation}
+
+ya que, los elementos de fila se consideran ya ordenados sucesivamente (sus coordenadas).
+
+Luego, (7) no se cumple si existe un número natural $c>1$, tal que
+
+\begin{equation}
+\begin{matrix}
+j_{k+c} = j_k+c \text{ } (= 1)\\
+\end{matrix}\\ \vee
+\begin{matrix}
+j_{k+c} = j_k-c \text{ } (= 1)\\
+\end{matrix},
+\end{equation}
+
+Por lo tanto, esto ocurre si solo si
+
+\begin{equation}
+\begin{matrix}
+j_{k+c} + i_{k+c} = j_k + i_k \text{ } (= 1)\\
+\end{matrix}\\ \vee
+\begin{matrix}
+j_{k+c} - i_{k+c} = j_k - i_k \text{ } (= 1)\\
+\end{matrix},
+\end{equation}
+
+Este resultado obtenido en (10), es equivalente a (6) y (7), cuando el candidato a solución de la matriz $X$ es una secuencia de valores que indican las columnas en las que se ubican las reinas, y cuyo orden en la secuencia indica la fila en la que se ubica.
+
+\textbf{Observación}: se han omitido demostraciones de existencia de solución.
+
+
+
+\end{document}

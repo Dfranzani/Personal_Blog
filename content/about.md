@@ -7,5 +7,3 @@ title: Sobre mi
 **Contacto**: 
 - Correo: dfranzani@gmail.com
 - [LinkedIn](https://www.linkedin.com/in/dfranzani/)
-
-[**Ver CV**](../danielfranzaniCV.pdf)

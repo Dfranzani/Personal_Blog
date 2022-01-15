@@ -1,0 +1,29 @@
+---
+title: 'Solucion: problema de lectura de archivo con nombre (o ruta) de caracteres en UTF-8'
+author: Daniel Franzani
+date: '2022-01-14'
+slug: []
+categories: []
+tags:
+  - R Studio
+  - R
+---
+
+<script src="{{< blogdown/postref >}}index_files/header-attrs/header-attrs.js"></script>
+
+
+<ul>
+<li><strong>Fecha del problema</strong>: 13 de enero del 2021</li>
+<li><strong>Fecha de solución</strong>: 14 de enero del 2021</li>
+</ul>
+<p>El 13 de enero me encuentro he decidido actualizar R, lo cual hago cada cierto tiempo. Y como es de costumbre, siempre hay inconvenientes, más aún cuando si usas R de manera interactiva con otros programas (por ejemplo Miktex). En este caso, opté por actualizar R y R Studio a la versión más reciente (a la fecha del problema), por lo que todo iba bien hasta que decidí correr un código muy simple en el que estaba trabajando.</p>
+<p>El problema ocurría al cargar una base de datos, en mi caso hago uso de la librería <code>openxlsx</code> de la siguiente manera:</p>
+<pre class="r"><code>library(openxlsx)
+df = read.xls(&quot;D:/Ejemplo/bases únicas/árbol.xlsx&quot;)</code></pre>
+<p>Lo cual arroja el siguiente mensaje:</p>
+<pre class="r"><code>Error in file(con, &quot;r&quot;) : invalid &#39;description&#39; argument
+In addition: Warning message: 
+In unzip(xlsxFile, exdir = xmlDir) : error 1 in extracting from zip file</code></pre>
+<p>Este mensaje, puede interpretarse como un error en la lectura de las rutas debido a que no está configurado el lenguaje regional (Panel de control -&gt; Región -&gt; Administrativo -&gt; Cambiar configuración regional del sistema) o que el comando <code>Sys.getlocale()</code> muestre una codificación no relacionada a caracteres UTF-8, ya que el problema radica en que R no logra leer el directorio de la base (o el nombre de esta) con los mismos caracteres, específicamente los tíldes. Sin embargo, no está claro a que se debe, siendo los motivos anteriores incorrectos.</p>
+<p>La solución más sencilla no está en tratar de arreglar o agregar elementos en los archivos de R, sino que lo mejor es volver a una versión anterior (lógicamente no tenía este error anteriormente). En mi caso utilizo una versión anterior tanto de R como Rstudio, ya que probé solo reinstalando una versión anterior de R pero no fue suficiente.</p>
+<p>Ahora solo nos toca que este “problema” sea aclarado o especificado. Para ello, es recomendable que sigan la página de Github de R y R Studio.</p>

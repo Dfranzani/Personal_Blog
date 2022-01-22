@@ -14,9 +14,9 @@ tags:
 
 <p>Siempre es de interés agregar nuevos tipos de gráficos a presentaciones o trabajos investigativos, uno de los que llama bastante la atención es el gráfico de Nube de Palabras o <em>wordcloud</em> en inglés. La finalidad de este tipo de gráfico está centrada en reflejar la frecuencia de palabras en los discursos (no entenderse únicamente como los discursos de oratoria sino que también como las producciones escritas) más allá del marco teórico en el que se esté trabajando.</p>
 <p>Para poder realizar un efectivo análisis de las frecuencias de las palabras en un discurso es natural pensar que no todas las palabras llegan a ser relevantes, ya que mucha de estas carecen de sentido si no están acompañadas de un sujeto o artículo, entre otras opciones ortográficas y gramaticales. En nuestro caso, el español es un lenguaje que presenta una gran cantidad de tiempo verbales, además de la presencia de género en las palabras, por ejemplo: trabajaré, trabajando (¿yo, él o tú?), trabajadora, trabajador, entre otras opciones. Por ende, es preferible trabajar con los infinitivos (ejemplo: trabajar) de las palabras o con aquellas que no requieren de otras palabras para tener sentido en su totalidad (ejemplo: trabajo, trabajadora).</p>
-<p>Llevar a cabo esta tarea en R puede ser tediosa y extensa, pero se cuenta con ayuda de varios paquetes para el procesamiento de las palabras. En particular, usaremos el paquete <strong>stringr</strong> (hay otras opciones) que trae una gran cantidad de funciones para procesar texto. La función a utilizar es <code>str_extract_all()</code>, la cual recibe dos argumentos, el primero corresponde al <em>string</em> que contiene la cadena de texto (toda la oración, párrafo o corpus) y el segundo indica el tipo de extracción (letras o palabras). El beneficio de esta función, es que automáticamente elimina aquellos caracteres que no son letras, por ejemplo los símbolos de operación matemática, signos de puntuación, números, espaciado, entre otros.</p>
-<p>Luego, solo resta eliminar aquellas palabras que carecen de sentido por si mismas (denominadas <strong>stopwords</strong>), para lo cual usaremos algún repositorio que contenga dicha información (hay paquetes en R que traen esta información, pero son bastante incompletos). En mi caso, utilicé un repositorio (siempre revisen el repositoriom ya que está construido por terceros, en este caso se utiliza de manera ilustrativa) de Github que contiene un listado de las <em>stopwords</em> en español (hay de varios idiomas). Cabe mencionar que pueden utilizar su propia lista de <strong>stopwords</strong>.</p>
-<p>A continuación dejo el código comentado del uso de esta función para el procesamiento del texto, junto a otra opción construida con funciones bases de R, para así entender la lógica detrás. Además, está incluida la función que genera el gráfico de nube de palabras a través de la función <code>wordcloud()</code> del paquete <strong>wordcloud</strong>.</p>
+<p>Llevar a cabo esta tarea en R puede ser tediosa y extensa, pero se cuenta con ayuda de varios paquetes para el procesamiento de texto. En particular, usaremos el paquete <strong>stringr</strong> (hay otras opciones) que trae una gran cantidad de funciones. La función a utilizar es <code>str_extract_all()</code>, la cual recibe dos argumentos, el primero corresponde al <em>string</em> que contiene la cadena de texto (oración, párrafo o corpus) y el segundo indica el tipo de extracción (letras o palabras). El beneficio de esta función, es que automáticamente elimina aquellos caracteres que no son letras, por ejemplo los símbolos de operación matemática, signos de puntuación, números, espaciado, entre otros.</p>
+<p>Luego, solo resta eliminar aquellas palabras que carecen de sentido por si mismas (denominadas <strong>stopwords</strong>), para lo cual usaremos algún repositorio que contenga dicha información (hay paquetes en R que traen esta información, pero son bastante incompletos). En mi caso, utilicé un repositorio (siempre revisen el repositorio ya que está construido por terceros, en este caso se utiliza de manera ilustrativa) de Github que contiene un listado de las <em>stopwords</em> en español (hay de varios idiomas). Cabe mencionar que pueden utilizar su propia lista.</p>
+<p>A continuación, se muestra el código comentado del uso de esta función para el procesamiento del texto, junto a otra opción construida con funciones bases de R, para así entender la lógica detrás. Además, está incluido el código que genera el gráfico de nube de palabras a través de la función <code>wordcloud()</code> del paquete <strong>wordcloud</strong>.</p>
 <pre class="r"><code>library(stringr) # Paquete para el procesamiento de texto
 library(wordcloud) # Paquete para generar el gráfico de nube de palabras
 library(viridis) # Paquete para utilizar paletas de colores
@@ -27,7 +27,7 @@ contador = function(texto, metodo = 2){ # Función para determinar las frecuenci
     texto = tolower(texto) # Convierte todo en letras minúsculas
     texto = unlist(stringr::str_extract_all(texto, boundary(&quot;word&quot;)))
     # La función &quot;stringr::str_extract_all(texto, boundary(&quot;word&quot;))&quot; Extrae las palabras del texto y
-    # las organiza en un lista. Luego, la función &quot;unlist&quot; lo organiza en un vector
+    # las organiza en un lista. Luego, la función &quot;unlist&quot; las organiza en un vector
   } else{ # Método que utiliza la construcción manual
     texto = tolower(texto) # Convierte todo en letras minúsculas
     texto = strsplit(texto, &quot;&quot;) # Separa las palabras del texto generando una lista, en donde cada casillas contiene 
@@ -66,9 +66,11 @@ w2 = contador(palabras, 2) # Generamos la tabla de frecuencias con el método ma
 
 # Graficamos ambas nubes
 par(mfrow = c(1,1))
-wordcloud(w1[,1], w1[,2], min.freq = 20, random.order = F, max.words = 100, scale = c(3.5,0.2), colors = viridis(5), rot.per = 0.35)</code></pre>
+wordcloud(w1[,1], w1[,2], min.freq = 20, random.order = F, max.words = 100, scale = c(3.5,0.2),
+          colors = viridis(5), rot.per = 0.35)</code></pre>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
-<pre class="r"><code>wordcloud(w2[,1], w2[,2], min.freq = 20, random.order = F, max.words = 100, scale = c(3.5,0.2), colors = viridis(5), rot.per = 0.2)</code></pre>
+<pre class="r"><code>wordcloud(w2[,1], w2[,2], min.freq = 20, random.order = F, max.words = 100, scale = c(3.5,0.2),
+          colors = viridis(5), rot.per = 0.2)</code></pre>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-2.png" width="672" /></p>
 <div id="comentarios" class="section level2">
 <h2>Comentarios</h2>

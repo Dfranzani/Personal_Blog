@@ -468,11 +468,11 @@ r2[1]
 ```
 
 
-Como se puede apreciar, el resultado es el mismo, tanto para la cantidad de soluciones como para la primera solución. Esto último se debe a que los caminos se recorren en "orden", a esto se llama solución lexicográfica.
+Como se puede apreciar, el resultado es el mismo tanto para la cantidad de soluciones como para la primera solución. Esto último, se debe a que los caminos se recorren en "orden", a esto se le llama solución lexicográfica.
 
 
 ## Comentarios
 
-- Los códigos son simplemente ejemplos, ya que para la opción 1 es posible ocupar los mismos criterios que en la opción 2. Es por esto, que la idea es proporcionar distintas alternativas, de tal manera que ustedes puedan aplicar y entender sus propias propuestas. 
+- Los códigos son simplemente ejemplos, ya que para la primer opción es posible ocupar los mismos criterios que en la segunda. Es por esto, que la idea es proporcionar distintas alternativas, de tal manera que ustedes puedan aplicar y entender sus propias propuestas. 
 
-- La gran ventaja de la búsqueda en paralelo es el tiempo que toma en descubrir las soluciones. Sin embargo, no todo es perfecto, el gran costo de esta técnica es el poder computacional que se necesita para llevarla a cabo. Por lo tanto, se recomienda estudiar el contexto del problema, ya que existen técnicas de búsqueda mucho más avanzadas que manejan los hiperparámetros de búsquedas, con el fin de hacerlas más eficientes (ejemplo: profundidad máxima a recorrer en los caminos, cantidad máxima de búsquedas paralelas).
+- La gran ventaja de la búsqueda en paralelo es el tiempo que toma en descubrir las soluciones. Sin embargo, no todo es perfecto, el gran costo de esta técnica es el poder computacional que se necesita para llevarla a cabo. Por lo tanto, se recomienda estudiar el contexto del problema, ya que existen técnicas de búsqueda mucho más avanzadas que manejan hiperparámetros de búsquedas, con el fin de hacerlas más eficientes (ejemplo: profundidad máxima a recorrer en los caminos, cantidad máxima de búsquedas paralelas).

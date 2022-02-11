@@ -76,7 +76,7 @@ wordcloud(w2[,1], w2[,2], min.freq = 20, random.order = F, max.words = 100, scal
 
 ```
 
-## Comentarios
+## Comentarios (Conttrol de cambio)
 
 Tal como se puede apreciar, los resultados son bastante similares. Sin embargo, en el método manual solo incorporé algunas de las situaciones ortográficas que pueden presentarse en el discurso (texto), por lo que deben haber muchas más. Por esto y otros motivos (tiempo de ejecución), es recomendable usar el paquete **stringr**. Cabe mencionar que los parámetros de la función *wordcloud* son bastante intuitivos, a excepción de los comandos `rot.per` y `scale`, el primero rota en 90 grados una proporción determinada del total de palabras en la nube (el valor del argumento va entre 0 y 1), el segundo maneja el tamaño de la nube de palabras y el tamaño ("espaciado") de las palabras dentro de esta.
 

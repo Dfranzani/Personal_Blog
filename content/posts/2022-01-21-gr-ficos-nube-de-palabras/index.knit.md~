@@ -19,7 +19,8 @@ Luego, solo resta eliminar aquellas palabras que carecen de sentido por si misma
 
 A continuación, se muestra el código comentado del uso de esta función para el procesamiento del texto, junto a otra opción construida con funciones bases de R, para así entender la lógica detrás. Además, está incluido el código que genera el gráfico de nube de palabras a través de la función `wordcloud()` del paquete **wordcloud**.
 
-```{r, message=FALSE, warning=FALSE}
+
+```r
 library(stringr) # Paquete para el procesamiento de texto
 library(wordcloud) # Paquete para generar el gráfico de nube de palabras
 library(viridis) # Paquete para utilizar paletas de colores
@@ -71,10 +72,16 @@ w2 = contador(palabras, 2) # Generamos la tabla de frecuencias con el método ma
 par(mfrow = c(1,1))
 wordcloud(w1[,1], w1[,2], min.freq = 20, random.order = F, max.words = 100, scale = c(3.5,0.2),
           colors = viridis(5), rot.per = 0.35)
+```
+
+<img src="index_files/figure-html/unnamed-chunk-1-1.png" width="672" />
+
+```r
 wordcloud(w2[,1], w2[,2], min.freq = 20, random.order = F, max.words = 100, scale = c(3.5,0.2),
           colors = viridis(5), rot.per = 0.2)
-
 ```
+
+<img src="index_files/figure-html/unnamed-chunk-1-2.png" width="672" />
 
 ## Comentarios Prueba
 

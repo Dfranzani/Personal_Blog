@@ -1,0 +1,93 @@
+---
+title: 'Gráficos: Nube de palabras'
+author: ''
+date: '2022-01-21'
+slug: []
+categories: []
+tags:
+  - R
+  - Plot
+---
+
+Siempre es de interés agregar nuevos tipos de gráficos a presentaciones o trabajos investigativos, uno de los que llama bastante la atención es el gráfico de Nube de Palabras o *wordcloud* en inglés. La finalidad de este tipo de gráfico está centrada en reflejar la frecuencia de palabras en los discursos (no entenderse únicamente como los discursos de oratoria sino que también como las producciones escritas) más allá del marco teórico en el que se esté trabajando.
+
+Para poder realizar un efectivo análisis de las frecuencias de las palabras en un discurso es natural pensar que no todas las palabras llegan a ser relevantes, ya que mucha de estas carecen de sentido si no están acompañadas de un sujeto o artículo, entre otras opciones ortográficas y gramaticales. En nuestro caso, el español es un lenguaje que presenta una gran cantidad de tiempo verbales, además de la presencia de género en las palabras, por ejemplo: trabajaré, trabajando (¿yo, él o tú?), trabajadora, trabajador, entre otras opciones. Por ende, es preferible trabajar con los infinitivos (ejemplo: trabajar) de las palabras o con aquellas que no requieren de otras palabras para tener sentido en su totalidad (ejemplo: trabajo, trabajadora).
+
+Llevar a cabo esta tarea en R puede ser tediosa y extensa, pero se cuenta con ayuda de varios paquetes para el procesamiento de texto. En particular, usaremos el paquete **stringr** (hay otras opciones) que trae una gran cantidad de funciones. La función a utilizar es `str_extract_all()`, la cual recibe dos argumentos, el primero corresponde al *string* que contiene la cadena de texto (oración, párrafo o corpus) y el segundo indica el tipo de extracción (letras o palabras). El beneficio de esta función, es que automáticamente elimina aquellos caracteres que no son letras, por ejemplo los símbolos de operación matemática, signos de puntuación, números, espaciado, entre otros.
+
+Luego, solo resta eliminar aquellas palabras que carecen de sentido por si mismas (denominadas **stopwords**), para lo cual usaremos algún repositorio que contenga dicha información (hay paquetes en R que traen esta información, pero son bastante incompletos). En mi caso, utilicé un repositorio (siempre revisen el repositorio ya que está construido por terceros, en este caso se utiliza de manera ilustrativa) de Github que contiene un listado de las *stopwords* en español (hay de varios idiomas). Cabe mencionar que pueden utilizar su propia lista.
+
+A continuación, se muestra el código comentado del uso de esta función para el procesamiento del texto, junto a otra opción construida con funciones bases de R, para así entender la lógica detrás. Además, está incluido el código que genera el gráfico de nube de palabras a través de la función `wordcloud()` del paquete **wordcloud**.
+
+
+```r
+library(stringr) # Paquete para el procesamiento de texto
+library(wordcloud) # Paquete para generar el gráfico de nube de palabras
+library(viridis) # Paquete para utilizar paletas de colores
+
+contador = function(texto, metodo = 2){ # Función para determinar las frecuencias de las palabras en el texto
+  # texto = "sd sd   sdasdasd "
+  if(metodo == 1){ # Método que utilizar el paquete "stringr"
+    texto = tolower(texto) # Convierte todo en letras minúsculas
+    texto = unlist(stringr::str_extract_all(texto, boundary("word")))
+    # La función "stringr::str_extract_all(texto, boundary("word"))" Extrae las palabras del texto y
+    # las organiza en un lista. Luego, la función "unlist" las organiza en un vector
+  } else{ # Método que utiliza la construcción manual
+    texto = tolower(texto) # Convierte todo en letras minúsculas
+    texto = strsplit(texto, "") # Separa las palabras del texto generando una lista, en donde cada casillas contiene 
+                                # los caracteres de cada palabras separados 
+                                # (aun no se eliminan los elementos que no sean letras)
+    texto = lapply(texto, function(x){ # Función para eliminar todo aquello que no sea letra
+      x = gsub("-", " ", x) # Reemplazamos los guiones por espacios con el fin de no generar palabras "pegadas"
+                            # Ejemplo: super-hombre = superhombre
+      x = x[x %in% c(letters, " ", "á", "é", "í", "ó", "ú", "ü")] # Elimina todo aquellos caracteres que no sean letras,
+                                                             # además de los espacios, diéresis y vocales con tildes.
+      x = paste0(x, collapse = "") # Unificamos nuevamente los caracteres en cada una de las casillas de la lista para 
+                                   # generar las palabras
+      return(x) # Retornamos el texto completo en un solo "string" (va dentro de una lista de una casilla)
+    })
+    texto = unlist(texto) # Transformamos la lista a vector
+    texto = unlist(strsplit(texto, " ")) # Separamos el texto por espacios, y los dejamos como vectos
+    texto = texto[texto != ""] # Eliminamos el exceso de espacios
+    # Ahora tenemos todas las palabras del texto por separado
+  }
+  
+  unicas = unique(texto) # Obtenemos las palabras distintas presentes en el texto
+  conteo = apply(as.matrix(unicas), 1, FUN = function(y){return(sum(texto == y))}) # Una tabla de frecuencia sencilla
+  df = data.frame("Palabra" = unicas, "Frecuencia" = conteo) # Los dejamos como "data frame"
+  swords = read.table("https://raw.githubusercontent.com/Alir3z4/stop-words/master/spanish.txt", encoding = "UTF-8") # Stopwords
+  # Utilizamos un repositorio de github que tiene un listado de Stopwords
+  df = df[!(df$Palabra %in% swords[,1]),] # Eliminamos los stopwords de la tabla de frecuencias
+  return(df)
+}
+
+palabras = readLines("https://www.gutenberg.org/files/49836/49836-0.txt", encoding = "UTF-8") # Texto extraído de una página
+palabras = palabras[92:8317] # Seleccionamos la sección que corresponde a texto de discurso (solo a modo de ejemplo)
+palabras = paste0(palabras, collapse = " ") # Pegamos todas las palabras para dejar todo dentro de un "string"
+
+w1 = contador(palabras, 1) # Generamos la tabla de frecuencias con el método que utiliza el paquete "stringr"
+w2 = contador(palabras, 2) # Generamos la tabla de frecuencias con el método manual
+
+# Graficamos ambas nubes
+par(mfrow = c(1,1))
+wordcloud(w1[,1], w1[,2], min.freq = 20, random.order = F, max.words = 100, scale = c(3.5,0.2),
+          colors = viridis(5), rot.per = 0.35)
+```
+
+<img src="index_files/figure-html/unnamed-chunk-1-1.png" width="672" />
+
+```r
+wordcloud(w2[,1], w2[,2], min.freq = 20, random.order = F, max.words = 100, scale = c(3.5,0.2),
+          colors = viridis(5), rot.per = 0.2)
+```
+
+<img src="index_files/figure-html/unnamed-chunk-1-2.png" width="672" />
+
+## Comentarios Prueba 3
+
+Tal como se puede apreciar, los resultados son bastante similares. Sin embargo, en el método manual solo incorporé algunas de las situaciones ortográficas que pueden presentarse en el discurso (texto), por lo que deben haber muchas más. Por esto y otros motivos (tiempo de ejecución), es recomendable usar el paquete **stringr**. Cabe mencionar que los parámetros de la función *wordcloud* son bastante intuitivos, a excepción de los comandos `rot.per` y `scale`, el primero rota en 90 grados una proporción determinada del total de palabras en la nube (el valor del argumento va entre 0 y 1), el segundo maneja el tamaño de la nube de palabras y el tamaño ("espaciado") de las palabras dentro de esta.
+
+Nota: El gráfico de *wordcloud* es bastante incómodo de trabajar cuando se trata de manipular márgenes del gráfico, títulos, entre otras cosas. Sin embargo, para todo hay solución.
+
+
+

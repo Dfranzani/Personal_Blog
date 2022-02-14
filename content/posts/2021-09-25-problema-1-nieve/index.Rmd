@@ -183,7 +183,3 @@ paste("La cantidad de bloques con agua es", lluvia2(columnas))
 ```
 
 Esto solo son algunos ejemplos de como abordar el problema, se extiende la invitación a crear sus propias soluciones.
-
-
-Ejemplo: control de cambios de prueba !
-

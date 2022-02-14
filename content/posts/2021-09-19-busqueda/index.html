@@ -1,0 +1,250 @@
+---
+title: "Problema de búsqueda 1: n - reinas"
+author: Daniel Franzani
+date: '2021-09-19'
+slug: []
+categories: []
+tags:
+  - R
+  - Heurística
+  - Búsqueda
+---
+
+<script src="{{< blogdown/postref >}}index_files/header-attrs/header-attrs.js"></script>
+
+
+<p>El problema de las reinas de ajedrez o mejor conocido como el de las <span class="math inline">\(n\)</span> - reinas, consiste en poner <span class="math inline">\(n\)</span> reinas en un tablero de ajedrez de dimensión <span class="math inline">\(n\times n\)</span> casillas (un grilla o matriz cuadrada) de tal manera que ninguna reina pueda “capturar” a otra (una reina puede capturar a otra si se encuentra en su misma fila, columna o diagonal). Por ende, la finalidad de problema es encontrar la (s) distribución (es) de las <span class="math inline">\(n\)</span> reinas en el tablero.</p>
+<p>Abordaremos el problema bajo la perspectiva de búsqueda con un enfoque desinformado, es decir, no conocemos característica alguna de la solución (estado final). Esto implica, que debemos usar las condiciones descritas en problema para poder evaluar si una solución es factible. Para llevar a cabo la búsqueda, realizaremos una del tipo en profundidad y otra del tipo en paralelo (las ventajas de desventajas de cada una pueden ser leídas aquí).</p>
+<p>Pasaremos directo al código e iremos comentando cada sección, con el fin de ilustrar paso a paso la solución. Cómo observación, es importante considerar que para los casos de 2 y 3 reinas no existe solución, esto puede verificarse empíricamente.</p>
+<div id="opción-1---búsqueda-en-profundidad" class="section level2">
+<h2><strong>Opción 1 - Búsqueda en profundidad</strong></h2>
+<p>Este enfoque evalúa los caminos uno a uno, hasta determinar si constituyen una posible solución (más adelante tendrá sentido). En primer lugar, declaramos la función que pregunta al usuario la cantidad de reinas que se desean colocar en el tablero.</p>
+<pre class="r"><code>option1 = function(){
+  
+  queens = as.integer(readline(&quot;Número de reinas: &quot;))</code></pre>
+<p>A continuación, definimos una función que evalúa si una reina dada las condiciones de “captura”. En los parámetros de la función se pide el tablero <code>aux.square</code> (con las reinas ya colocadas), la fila <code>i</code>, la columna <code>j</code> en donde se desea colocar una reina, y el <code>valor</code> de la reina (se considera 1 como el valor que representan a una reina en la casilla <span class="math inline">\(i,j\)</span>, por defecto las casillas el tablero son 0).</p>
+<pre class="r"><code>  possible = function(aux.square,i,j,valor){</code></pre>
+<p>Luego, se asigna a la casilla candidata de posible posición el valor de 1 (no hay otra opción), además se crean las variables de <code>aux.col</code> y <code>aux.row</code>, las cuales determinan si el <code>aux.square</code> cumple con el requisito de que las reinas no se capturen en las filas y columnas. Este requisito se determina calculando la suma de de las filas y columnas, ya que al estar compuesto por ceros y unos, un valor superior a 1 indica que el criterio no se cumple.</p>
+<pre class="r"><code>    aux.square[i,j] = valor
+
+    aux.col = apply(aux.square, 2, FUN = function(colum){
+      if(sum(colum) &lt;= 1) return(TRUE)
+      else return(FALSE)
+    })
+    aux.col = ifelse(sum(!aux.col) == 0, TRUE, FALSE)
+    
+    aux.row = apply(aux.square, 1, FUN = function(rows){
+      if(sum(rows) &lt;= 1) return(TRUE)
+      else return(FALSE)
+    })
+    aux.row = ifelse(sum(!aux.row) == 0, TRUE, FALSE)</code></pre>
+<p>Del mismo modo, se desean determinar las sumas en las diagonales del tablero (no es necesario considerar una posible diagonal de 1 casilla, pero de todas formas no afecta el procedimiento en el <em>script</em>). La variable <code>diag.principales</code> guarda el valor de verdadero o falso respecto a la suma de las casillas de las diagonales principales (al igual que las filas y columnas, estas no deben sumar más de 1).</p>
+<pre class="r"><code>    diag.principales = c(0,0)
+    
+    for (i in 1:queens) {
+      diag.principales[1] = sum(diag.principales[1],aux.square[i,i])
+      diag.principales[2] = sum(diag.principales[2],aux.square[i,(queens - i + 1)])
+    }
+    
+    diag.principales = ifelse(diag.principales &lt;= 1, TRUE, FALSE)
+    diag.principales = ifelse(sum(diag.principales) == 2, TRUE, FALSE)</code></pre>
+<p>Para el caso de las “diagonales secundarias” (corresponden a todas las diagonales que se pueda formar y que no sean las principales), es posible determinarlas a partir de casillas de la primer fila de la matriz, sin considerar los extremos, ya que como se comentó, no es necesario considerar las diagonales compuestas por una casillas (esquinas).</p>
+<p>Los casillas de la primer fila que nos permiten determinar todas las diagonales secundarias se guardarán en la variable <code>key.points</code>.</p>
+<pre class="r"><code>    key.points = matrix(c(rep(1,(queens - 2)), seq(2,(queens - 1))),
+                        ncol = 2,
+                        nrow = (queens - 2))</code></pre>
+<p>La función <code>diags()</code> que determina las diagonales secundarias y verifica las sumas de estas mediante la función <code>suma.diag()</code>. La función <code>suma.diag()</code> recibe como argumento las diagonales secundarias y retorna si es verdadero o falso que la suma de las casillas de las componen es menor o igual a 1.</p>
+<p>Por otro lado, la variable <code>report.diag</code> guarda los valores de las diagonales que se generan a partir de los <code>key.points</code>. La relación de como se determinan estás casillas, está expresada en las variables <code>first.diag</code>, <code>second.diag</code>, <code>third.diag</code> y <code>fourth.diag</code>.</p>
+<p>Luego la variable <code>aux.sumas</code> guarda los los resultados de la función <code>suma.diag()</code> ya mencionada, cuando recibe de argumento la variable <code>report.diag</code>.</p>
+<pre class="r"><code>    diags = function(aux.key.points){
+      
+      suma.diag = function(M){
+        x = M[1,]; y = M[2,]
+         # Puntos entre los extremos de las diagonales, se obtiene restando las coordenadas de fila y sumando (1,1)
+        n = abs(y[1] -  x[1]) - 1
+        suma = aux.square[x[1],x[2]] + aux.square[y[1],y[2]]
+        if(n &gt;0){
+          for (i in 1:n) {
+            if(x[1] &lt; y[1] &amp; x[2] &gt; y[2]) suma = suma + aux.square[(x[1]+i),(x[2]-i)]
+            if(x[1] &lt; y[1] &amp; x[2] &lt; y[2]) suma = suma + aux.square[(x[1]+i),(x[2]+i)]
+            if(x[1] &gt; y[1] &amp; x[2] &lt; y[2]) suma = suma + aux.square[(x[1]-i),(x[2]+i)]
+            if(x[1] &gt; y[1] &amp; x[2] &gt; y[2]) suma = suma + aux.square[(x[1]-i),(x[2]-i)]
+          }
+        }
+        
+        if(suma &lt;= 1) return(TRUE)
+        else return(FALSE)
+      }
+      
+      report.diag = list()
+      
+      # Recorremos la matriz de puntos claves, por cada uno buscaremos las diagonales que se generan
+      for (i in 1:dim(aux.key.points)[1]) { 
+        
+        first.diag = rbind(aux.key.points[i,],c(aux.key.points[i,2],aux.key.points[i,1]))
+        
+        second.diag = rbind(first.diag[2,], first.diag[2,] + c(1,1)*(queens - aux.key.points[i,2]))
+        
+        third.diag = rbind(second.diag[2,], c(second.diag[2,2],second.diag[2,1])) 
+        
+        fourth.diag = rbind(third.diag[2,], first.diag[1,])
+        
+        aux.diags = list(first.diag, second.diag,third.diag, fourth.diag)
+        
+        aux.sumas = lapply(aux.diags, function(x){ 
+          return(suma.diag(x))
+        })
+        report.diag[[i]] = unlist(aux.sumas)
+      }
+      return(report.diag)
+    }</code></pre>
+<p>El resultado de la función <code>diags()</code> se guarda en la variable <code>diag.secundarias</code>, que finalmente contiene la suma de cada diagonal secundaria, para luego verificar que en cada una de ellas se cumple el criterio de que no sea mayor a 1, es decir que las reinas no se captura entre si.</p>
+<pre class="r"><code>    diag.secundarias = diags(key.points)
+    diag.secundarias = ifelse(sum(!unlist(diag.secundarias)) == 0, TRUE, FALSE)</code></pre>
+<p>Los criterios sobre las diagonales son unificados como una único resultado en la variable <code>diagonals</code>. En este punto finaliza la función <code>possible()</code>, retornando un valor de verdadero o falso sobre el cumplimiento de los criterios (filas, columnas y diagonales).</p>
+<pre class="r"><code>    diagonals = ifelse(diag.principales == TRUE &amp; diag.secundarias == TRUE, TRUE, FALSE)
+    
+    # Verificación en conjunto
+    if(aux.col == TRUE &amp; aux.row == TRUE &amp; diagonals == TRUE) return(TRUE) 
+    else return(FALSE)
+    
+  }</code></pre>
+<p>Para finalizar, se declara la función <code>solve()</code> (recursiva), la cual evalúa en orden las casillas del tablero (por fila de izquierda a derecha) determinando si son posiciones posibles (admisibles) para una solución. De este modo, la función sigue en proceso hasta verificar que la cantidad de reinas en el tablero es <span class="math inline">\(n\)</span>. Además, no se detiene al encontrar una única solución, sino que determina todas las soluciones posibles y las guarda en las variable <code>solutions</code>.</p>
+<pre class="r"><code>  solve = function(board){
+      for (i in 1:queens) {
+        for (j in 1:queens) {
+          if(board[i,j] == 0){
+            if(possible(board,i,j,1)){ # Posición admisible
+              board[i,j] = 1
+              if(sum(board) == queens){ # Criterio de solución
+                solutions[[length(solutions)+1]] &lt;&lt;- board
+                break()
+              }
+              solve(board) # Criterio recursivo
+              board[i,j] = 0
+            }
+          }
+        }
+      # Criterio de no admisibilidad
+      if(sum(board[i,]) == 0) return()
+    }
+  }
+
+solutions = list()
+square = matrix(0,ncol = queens, nrow = queens)
+solve(square)
+
+print(paste(&quot;All solutions: &quot;,length(solutions)))
+return(solutions)
+
+}</code></pre>
+<p>Al inicio comentamos que la búsqueda es en profundidad, esto se debe a que la función <code>solve()</code> evalúa las posiciones de las reinas, según se recorren los ciclos <code>for</code>, de este modo, las posibles soluciones finales se recorren 1 a 1 en cada iteración.</p>
+<p>Para ejemplificar, evaluemos el problema con 5 reinas.</p>
+<pre class="r"><code># Omití el argumento interactivo (readLine), para efectos del ejemplo
+r1 = option1(5) # Imprime el total de soluciones encontradas
+## [1] &quot;All solutions:  10&quot;
+r1[1] # La primera solución obtenida
+## [[1]]
+##      [,1] [,2] [,3] [,4] [,5]
+## [1,]    1    0    0    0    0
+## [2,]    0    0    1    0    0
+## [3,]    0    0    0    0    1
+## [4,]    0    1    0    0    0
+## [5,]    0    0    0    1    0</code></pre>
+<p>Como se puede aprecia, la solución muestra la distribución de las reinas en el tablero</p>
+</div>
+<div id="opción-2---búsqueda-en-paralelo" class="section level2">
+<h2><strong>Opción 2 - Búsqueda en paralelo</strong></h2>
+<p>Este enfoque evalúa los caminos al mismo tiempo. Para ejemplificar, veamos las soluciones de 4 reinas.</p>
+<pre class="r"><code>r1 = option1(4) 
+## [1] &quot;All solutions:  2&quot;
+r1
+## [[1]]
+##      [,1] [,2] [,3] [,4]
+## [1,]    0    1    0    0
+## [2,]    0    0    0    1
+## [3,]    1    0    0    0
+## [4,]    0    0    1    0
+## 
+## [[2]]
+##      [,1] [,2] [,3] [,4]
+## [1,]    0    0    1    0
+## [2,]    1    0    0    0
+## [3,]    0    0    0    1
+## [4,]    0    1    0    0</code></pre>
+<p>Como se aprecia, las soluciones se diferencian en todas las posiciones, específicamente estamos interesados en la primera fila, ya que la búsqueda se realiza en orden de filas. En este sentido, es tentador evaluar simultáneamente todos los caminos que se van generando fila a fila.</p>
+<p>En primer lugar, declaramos la función que pregunta al usuario la cantidad de reinas que se desean colocar en el tablero.</p>
+<pre class="r"><code>option2 = function(){
+
+  n = as.integer(readline(&quot;Number of Queens?: &quot;))
+  solutions = list()</code></pre>
+<p>Luego, a diferencia de la opción 1 se tiene una única función (<code>Queens()</code>), más breve, que determina las posiciones de las reinas. Para ello, se trabaja con la siguiente propiedad propiedad:</p>
+<ul>
+<li>Consideramos como solución a un vector que contenga la posición de cada reina en una determinada columna, siendo la posición en el vector, la fila que le corresponde a dicha reina.</li>
+</ul>
+<p>¿Podríamos decir que esto es magia? Por supuesto que no, el argumento que nos permite deducir esto lo puedes encontrar en mis <a href="Problema+de+busqueda+1/Busqueda+en+paralelo.pdf">apuntes</a> (nota: pueden haber errores de tipeo). En el fondo, se recurre al hecho de que las soluciones pueden ordenarse convenientemente en un vector, esto permite que se mucho más fácil evaluar los distintos caminos de las soluciones al mismo tiempo.</p>
+<p>Volviendo a la función <code>Queens()</code>, la variable <code>diags</code> guarda las casillas correspondientes a la proyección de las diagonales desde una fila a otra (ejemplo: desde la fila 1 y 2, a la fila 3), esto “genera” casillas que están fuera de la matriz, pero las cuales son eliminadas en las variable <code>possible.colums</code> que guarda las casillas en donde es admisible la posición de una reina. Esto permite resumir el problema a una “proyección de diagonales”, eliminando los criterios de filas y columnas (genial!).</p>
+<p>Finalmente se hace uso de la recursividad mediante la función <code>apply()</code> la cual nos permite llamar a la función en paralelo para cada camino. El resto de código imprime la cantidad total de soluciones y guarda las soluciones en forma matricial.</p>
+<pre class="r"><code>  Queens = function(positions) {
+    
+    # Imprime la solución al momento de obtener 8 posiciones que cumplen las condiciones
+    if (length(positions) == n) {
+      solutions[[length(solutions)+1]] &lt;&lt;- positions
+    }
+    
+    # Definimos las columnas posibles en donde puede ir una reina
+    possible.colums = setdiff(1:n, positions)
+    
+    # Determinamos las diagonales matriciales en donde no puede ir una reina
+    out.diags = seq(length(positions), 1)
+    diags = c(positions + out.diags, positions - out.diags)
+    diags = diags[diags &gt;= 1 &amp; diags &lt;= n]
+    
+    # Eliminamos las casillas diagonales, de las casillas posibles en donde ubicar a una reina
+    possible.colums = setdiff(possible.colums, diags)
+    
+    # Para cada posibilidad se evalúa nuevamente la función
+    if(length(possible.colums &gt; 0)){
+      apply(matrix(possible.colums), 1, FUN = function(p){
+        Queens(c(positions,p)) # Se añaden las opciones posibles a cada iteración
+      })
+    }
+  }
+  
+  Queens(c())
+  
+  # Imprimimos la cantidad de soluciones posibles
+  print(paste(&quot;All solutions: &quot;,length(solutions)))
+
+  # Transformar soluciones en matrices
+  solutions = lapply(solutions, function(sol){
+    M = matrix(0, ncol = n, nrow = n)
+    for (i in 1:n) {
+      M[i,sol[i]] = 1
+    }
+    return(M)
+  })
+  
+  # Retorna las matrices solución
+  return(solutions)
+}</code></pre>
+<p>Comparemos lo obtenido con la opción 1.</p>
+<pre class="r"><code>r2 = option2(5)
+## [1] &quot;All solutions:  10&quot;
+r2[1]
+## [[1]]
+##      [,1] [,2] [,3] [,4] [,5]
+## [1,]    1    0    0    0    0
+## [2,]    0    0    1    0    0
+## [3,]    0    0    0    0    1
+## [4,]    0    1    0    0    0
+## [5,]    0    0    0    1    0</code></pre>
+<p>Como se puede apreciar, el resultado es el mismo tanto para la cantidad de soluciones como para la primera solución. Esto último, se debe a que los caminos se recorren en “orden”, a esto se le llama solución lexicográfica.</p>
+</div>
+<div id="comentarios" class="section level2">
+<h2>Comentarios</h2>
+<ul>
+<li><p>Los códigos son simplemente ejemplos, ya que para la primer opción es posible ocupar los mismos criterios que en la segunda. Es por esto, que la idea es proporcionar distintas alternativas, de tal manera que ustedes puedan aplicar y entender sus propias propuestas.</p></li>
+<li><p>La gran ventaja de la búsqueda en paralelo es el tiempo que toma en descubrir las soluciones. Sin embargo, no todo es perfecto, el gran costo de esta técnica es el poder computacional que se necesita para llevarla a cabo. Por lo tanto, se recomienda estudiar el contexto del problema, ya que existen técnicas de búsqueda mucho más avanzadas que manejan hiperparámetros de búsquedas, con el fin de hacerlas más eficientes (ejemplo: profundidad máxima a recorrer en los caminos, cantidad máxima de búsquedas paralelas).</p></li>
+</ul>
+</div>
